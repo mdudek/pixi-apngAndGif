@@ -7840,7 +7840,7 @@
         UPNG.quantize = function (abuf, ps) {
             var oimg = new Uint8Array(abuf), nimg = oimg.slice(0), nimg32 = new Uint32Array(nimg.buffer);
             var KD = UPNG.quantize.getKDtree(nimg, ps);
-            var root = KD[0], leafs = KD[1];
+            var {root, leafs} = KD;
             var planeDst = UPNG.quantize.planeDst;
             var sb = oimg, tb = nimg32, len = sb.length;
             var inds = new Uint8Array(oimg.length >> 2);

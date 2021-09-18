@@ -1,39 +1,52 @@
-import $getExeName from './lib/_getExeName'        // 用于获取路径扩展名
-import $omggif from './lib/_omggif'                // gif图片编解码
-import $upngjs from './lib/_upng'                  // png图片编解码
+import {$getExeName}  from './lib/_getExeName'        // 用于获取路径扩展名
+import {$omggif} from './lib/_omggif'                // gif图片编解码
+import { decodeBuffer, uPng } from './lib/_upng'
+import {Ticker} from '@pixi/ticker';
+import {Sprite} from '@pixi/sprite';
+import {BaseTexture, Texture} from '@pixi/core';
+import {Rectangle} from '@pixi/math';                  // png图片编解码
 
 class Image{
+    private esource: any;
+    private resources: any;
+    private temp: {
+        tickerIsAdd?: Boolean;
+        loop?: any;
+        events: {} };
+    private __method: { play: (loop, callback) => void };
+    private __attr: { loop: number; autoPlay: boolean };
+    private __status: { loops: number; time: number; status: string; frame: number };
+    private ticker: Ticker;
+    private sprite: Sprite;
+    private textures: any;
+    private framesDelay: any;
     constructor(esource,resources){
-        const _ts = this;
-        _ts.esource = esource;
-        _ts.resources = resources;
+        this.esource = esource;
+        this.resources = resources;
 
-        _ts.init();
+        this.init();
     }
-    init(){
-        const _ts = this,
-            esource = _ts.esource,
-            resources = _ts.resources;
 
-        _ts.temp = {                                        // 临时数据
+    init(){
+        this.temp = {                                        // 临时数据
             //loop:0,                                       // 保存当前需要播放的次数
             //tickerIsAdd:undefined                         // 保存轮循执行器是否添加
             events:{}                                       // 用于存放事件
         };
 
         // 属性
-        _ts.__attr = {
+        this.__attr = {
             autoPlay:true,     // 默认自动播放
             loop:0             // 默认无限次播放
         };
 
         // 方法
-        _ts.__method = {
-            play:_ts.play       // 播放方法
+        this.__method = {
+            play:this.play       // 播放方法
         };
 
         // 状态
-        _ts.__status = {
+        this.__status = {
             status:'init',      // 状态，默认初始化（init、playing、played、pause、stop）
             frame:0,            // 当前帧数
             loops:0,            // 连续循环播放次数，停止播放会清0
@@ -41,83 +54,81 @@ class Image{
         };
         
         // 循环执行器
-        _ts.ticker = new PIXI.Ticker();
-        _ts.ticker.stop();
+        this.ticker = new Ticker();
+        this.ticker.stop();
 
         // 精灵
-        _ts.sprite = this.createSprite(esource,resources);
+        this.sprite = this.createSprite(this.esource,this.resources);
     }
 
     // 播放
-    play(loop,callback){
-        const _ts = this;
-
+    play(loop?,callback?){
         // 没有纹理材质时抛出错误
-        if(!_ts.textures.length){
+        if(!this.textures.length){
             throw new Error('没有可用的textures');
-        };
+        }
 
         // 纹理材质只有一帧时不往下执行
-        if(_ts.textures.length === 1){
+        if(this.textures.length === 1){
             return;
-        };
+        }
 
-        let status = _ts.__status,
-            attr = _ts.__attr,
+        let status = this.__status,
+            attr = this.__attr,
             time = 0;
 
         // 当状态是停止的时候，将播放次数清0
         if(status.status === 'stop'){
             status.loops = 0;
-        };
+        }
 
         // 设置循环参数
         loop = typeof loop === 'number' ? loop : attr.loop;
-        _ts.temp.loop = loop;
+        this.temp.loop = loop;
         attr.loop = loop;
         
         // 为轮循执行器添加一个操作
-        if(!_ts.temp.tickerIsAdd){
-            _ts.ticker.add(deltaTime => {
-                let elapsed = PIXI.Ticker.shared.elapsedMS;
+        if(!this.temp.tickerIsAdd){
+            this.ticker.add(deltaTime => {
+                let elapsed = Ticker.shared.elapsedMS;
                 time+=elapsed;
 
                 // 当帧停留时间已达到间隔帧率时播放下一帧
-                if(time > _ts.framesDelay[status.frame]){
+                if(time > this.framesDelay[status.frame]){
                     status.frame++;
 
                     // 修改状态为执行中
                     status.status = 'playing';
     
                     // 当一次播放完成，将播放帧归0，并记录播放次数
-                    if(status.frame > _ts.textures.length - 1){
+                    if(status.frame > this.textures.length - 1){
                         status.frame = 0;
                         status.loops++;
     
                         // 当指定了有效的播放次数并且当前播放次数达到指定次数时，执行回调则停止播放
-                        if(_ts.temp.loop > 0 && status.loops >= _ts.temp.loop){
+                        if(this.temp.loop > 0 && status.loops >= this.temp.loop){
                             if(typeof callback === 'function'){
                                 callback(status);
                             };
                             // 修改状态为执行完成并停止
                             status.status = 'played';
-                            _ts.runEvent('played',status);
-                            _ts.stop();
-                        };
-                    };
+                            this.runEvent('played',status);
+                            this.stop();
+                        }
+                    }
     
                     // 修改精灵纹理材质与当前的帧率相匹配
-                    _ts.sprite.texture = _ts.textures[status.frame];
+                    this.sprite.texture = this.textures[status.frame];
                     time = 0;
 
-                    _ts.runEvent('playing',status);
-                };
+                    this.runEvent('playing',status);
+                }
             });
-            _ts.temp.tickerIsAdd = true;
-        };
+            this.temp.tickerIsAdd = true;
+        }
         
         // 让轮循执行器开始执行
-        _ts.ticker.start();
+        this.ticker.start();
     }
 
     // 暂停
@@ -146,7 +157,7 @@ class Image{
         // 没有纹理材质时抛出错误
         if(!textures.length){
             throw new Error('没有可用的textures');
-        };
+        }
 
         let status = _ts.__status;
 
@@ -155,24 +166,23 @@ class Image{
         if(typeof frameIndex === 'number'){
             _ts.sprite.texture = textures[frameIndex];
             status.frame = frameIndex;
-        };
+        }
     }
 
     // 获取总播放时长
     getDuration(){
-        const _ts = this,
-            framesDelay = _ts.framesDelay;
+        const framesDelay = this.framesDelay;
         
         // 没有帧时间时抛出错误
         if(!framesDelay.length){
             throw new Error('未找到图片帧时间');
-        };
+        }
 
         let time = 0;
 
         for(let i=0,len=framesDelay.length; i<len; i++){
             time += framesDelay[i];
-        };
+        }
         return time;
     }
 
@@ -207,7 +217,7 @@ class Image{
         let temp = this.temp;
         if(typeof temp.events[type] === 'function'){
             temp.events[type](status);
-        };
+        }
     }
 
     /**
@@ -219,7 +229,7 @@ class Image{
     createSprite(esource,resources){
         const _ts = this;
 
-        let Sprite = PIXI.Sprite,
+        let
             
             imgSrc = esource,
             exeName = $getExeName(imgSrc.toLocaleLowerCase());
@@ -267,8 +277,8 @@ class Image{
                 textures:[]
             },
             buf = new Uint8Array(resource.data),
-            upng = $upngjs.decode(buf),
-            rgba = $upngjs.toRGBA8(upng),
+            upng = decodeBuffer(buf),
+            rgba = uPng(upng),
             pngWidth = upng.width,
             pngHeight = upng.height,
             pngFramesLen = upng.frames.length,
@@ -293,14 +303,14 @@ class Image{
             canvas.width = pngWidth;
             canvas.height = pngHeight;
             ctx = canvas.getContext('2d');
-            spriteSheet = new PIXI.BaseTexture.from(canvas);
+            spriteSheet = BaseTexture.from(canvas);
             
             imageData = ctx.createImageData(pngWidth,pngHeight);
             imageData.data.set(data);
             ctx.putImageData(imageData,0,0);
 
-            obj.textures.push(new PIXI.Texture(spriteSheet,new PIXI.Rectangle(0, 0, pngWidth, pngHeight)));
-        };
+            obj.textures.push(new Texture(spriteSheet,new Rectangle(0, 0, pngWidth, pngHeight)));
+        }
 
         // document.body.appendChild(canvas);
         return obj;
@@ -351,8 +361,8 @@ class Image{
             //将上面创建的图像数据放回到画面上
             ctx.putImageData(imageData, 0, 0);
 
-            spriteSheet = new PIXI.BaseTexture.from(canvas);
-            obj.textures.push(new PIXI.Texture(spriteSheet,new PIXI.Rectangle(0, 0, gifWidth, gifHeight)));
+            spriteSheet = BaseTexture.from(canvas);
+            obj.textures.push(new Texture(spriteSheet,new Rectangle(0, 0, gifWidth, gifHeight)));
         };
         // document.body.appendChild(canvas);
         return obj;
