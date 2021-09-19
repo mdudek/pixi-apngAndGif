@@ -9,7 +9,8 @@
     "build-dts": "webpack --mode development --env minify=true --env library=true --env generateDTS=true",
     "build-demo": "webpack --mode development --env minify=true",
     "start-demo": "webpack serve --no-client-overlay --mode development --env minify=true",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "publish": "npm publish --access public"
   },
   "repository": {
     "type": "git",
