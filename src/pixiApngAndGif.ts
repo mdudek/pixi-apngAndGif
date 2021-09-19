@@ -16,9 +16,10 @@ class Image {
     private __attr: {loop: number; autoPlay: boolean };
     private __status: {loops: number; time: number; status: string; frame: number };
     private ticker: Ticker;
-    private sprite: Sprite;
     private textures: any;
     private framesDelay: any;
+
+    sprite: Sprite;
 
     constructor(private eSource, private resources) {
         this.init();

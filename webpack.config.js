@@ -8,6 +8,7 @@ const NpmDtsPlugin = require('npm-dts-webpack-plugin');
 module.exports = (env, options) => {
     const minify = !!env.minify;
     const isLibrary = !!env.library;
+    const generateDTS = !!env.generateDTS;
     return {
         entry: isLibrary ? {
             pixiApngAndGif: './src/pixiApngAndGif.ts'
@@ -83,11 +84,12 @@ module.exports = (env, options) => {
             extensions: ['.tsx', '.ts', '.js'],
         },
         plugins: [
-            ...(isLibrary ? [
+            ...(generateDTS ? [
                 new NpmDtsPlugin({
                     entry: 'src/pixiApngAndGif.ts'
                 })
-            ] : [new HtmlWebpackPlugin({
+            ] : []),
+            ...(isLibrary ? [] : [new HtmlWebpackPlugin({
                 template: 'src/demo/index.html',
                 filename: 'index.html',
                 chunks: ['demo'],
