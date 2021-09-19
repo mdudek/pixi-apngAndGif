@@ -3,6 +3,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const NpmDtsPlugin = require('npm-dts-webpack-plugin');
 
 module.exports = (env, options) => {
     const minify = !!env.minify;
@@ -82,7 +83,11 @@ module.exports = (env, options) => {
             extensions: ['.tsx', '.ts', '.js'],
         },
         plugins: [
-            ...(isLibrary ? [] : [new HtmlWebpackPlugin({
+            ...(isLibrary ? [
+                new NpmDtsPlugin({
+                    entry: 'src/pixiApngAndGif.ts'
+                })
+            ] : [new HtmlWebpackPlugin({
                 template: 'src/demo/index.html',
                 filename: 'index.html',
                 chunks: ['demo'],
@@ -94,7 +99,8 @@ module.exports = (env, options) => {
                 // both options are optional
                 filename: 'css/[name].[contenthash].css',
                 chunkFilename: 'css/[id].[contenthash].css',
-            })
+            }),
+
             // new BundleAnalyzerPlugin()
         ],
         ...(isLibrary ? {externals: /^(@pixi\/.*)/i} : {}),

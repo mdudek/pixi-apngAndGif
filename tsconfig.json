@@ -14,5 +14,6 @@
       "dom",
       "es5"
     ]
-  }
+  },
+  "exclude": ["index.d.ts"]
 }
