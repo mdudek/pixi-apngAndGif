@@ -1,4 +1,4 @@
-declare module 'pixi-apngandgif' {
+declare module '@mdudek/pixi-apngandgif' {
   import { Sprite } from '@pixi/sprite';
   class Image {
       private eSource;

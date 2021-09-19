@@ -1,8 +1,8 @@
 import { Image } from '../pixiApngAndGif'
-import {Application} from '@pixi/app';
+import { Application } from '@pixi/app';
 import { Loader, LoaderResource } from '@pixi/loaders';
 import { Renderer, BatchRenderer } from '@pixi/core';
-import {TickerPlugin} from '@pixi/ticker';
+import { TickerPlugin } from '@pixi/ticker';
 
 Application.registerPlugin(TickerPlugin);
 Renderer.registerPlugin('batch', BatchRenderer);
@@ -20,24 +20,24 @@ const loader = Loader.shared,
     loadOption = {
         loadType: LoaderResource.LOAD_TYPE.XHR,
         xhrType: LoaderResource.XHR_RESPONSE_TYPE.BUFFER,
-        crossOrigin:''
+        crossOrigin: ''
     },
     imgs = {
-        gif:'http://isparta.github.io/compare/image/dongtai/gif/1.gif',
-        apng:'http://isparta.github.io/compare/image/dongtai/apng/1.png'
+        gif: 'http://isparta.github.io/compare/image/dongtai/gif/1.gif',
+        apng: 'http://isparta.github.io/compare/image/dongtai/apng/1.png'
         // gif:'./1.gif',
         // apng:'./1.png'
     };
 
 
-loader.add(imgs.gif,loadOption);
-loader.add(imgs.apng,loadOption);
+loader.add(imgs.gif, loadOption);
+loader.add(imgs.apng, loadOption);
 
-loader.load((progress,resources)=>{
+loader.load((progress, resources) => {
     document.title = title;
 
-    window['gif'] = new Image(imgs.gif,resources);
-    window['apng'] = new Image(imgs.apng,resources);
+    window['gif'] = new Image(imgs.gif, resources);
+    window['apng'] = new Image(imgs.apng, resources);
 
     let gifSprite = window['gif'].sprite,
         apngSprite = window['apng'].sprite;

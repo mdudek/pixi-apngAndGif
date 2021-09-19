@@ -1,92 +1,72 @@
-# Pixi-apngAndGif
+# @mdudek/pixi-apngandgif
 
 Let Pixi.js support apng, gif images. And allow control of its operation.
 
+### This repository is a fork of https://github.com/sbfkcel/pixi-apngAndGif
+
+### Important changes:   
+ - Depends on @pixi/* packages
+ - The source code was converted to typescript 
+ - Bundled by webpack 
+
 ## DEMO
 
-- Global [**Pixi-apngAndGif.js Use the demo**](http://jsbin.com/nodeto/edit?html,js,output)
-- 中国大陆 [**Pixi-apngAndGif.js Use the demo**](https://jsrun.net/yXhKp)
+- [**Use the demo**](http://jsbin.com/nodeto/edit?html,js,output)
 
 # USE
 
 ### ES6
 
 ```bash
-# Support pixi4.0
-npm install pixi-apngandgif@1.0.0
 
-# Support pixi5.0+
-npm install pixi-apngandgif
+# Support pixi6.0+
+npm install @mdudek/pixi-apngandgif
 ```
 
 ```javascript
-import PixiApngAndGif from 'pixi-apngandgif'
+import { Image } from '@mdudek/pixi-apngandgif'
+import { Application } from '@pixi/app';
+import { Loader, LoaderResource } from '@pixi/loaders';
+import { Renderer, BatchRenderer } from '@pixi/core';
+import { TickerPlugin } from '@pixi/ticker';
 
-const app = new PIXI.Application();
-const loader = PIXI.Loader.shared,
-    loadOption = {
-        loadType: PIXI.LoaderResource.LOAD_TYPE.XHR,
-        xhrType: PIXI.LoaderResource.XHR_RESPONSE_TYPE.BUFFER,
-        crossOrigin:''
-    },
-    imgs = {
-        gif:'http://isparta.github.io/compare/image/dongtai/gif/1.gif',
-        apng:'http://isparta.github.io/compare/image/dongtai/apng/1.png'
-    };
-
-loader.add(imgs.gif,loadOption);
-loader.add(imgs.apng,loadOption);
-loader.load((progress,resources)=>{
-    window.gif = new PixiApngAndGif(imgs.gif,resources);
-    window.apng = new PixiApngAndGif(imgs.apng,resources);
-
-    let gifSprite = window.gif.sprite,
-        apngSprite = window.apng.sprite;
-
-    gifSprite.x = 100;
-    apngSprite.x = 450;
-
-    gifSprite.y = 160;
-    apngSprite.y = 160;
-
-    app.stage.addChild(gifSprite);
-    app.stage.addChild(apngSprite);
+Application.registerPlugin(TickerPlugin);
+Renderer.registerPlugin('batch', BatchRenderer);
+const app = new Application({
+    width: 800,
+    height: 600,
+    backgroundAlpha: 0,
+    backgroundColor: 0x000000,
+    preserveDrawingBuffer: false,
+    antialias: false,
 });
 
-document.body.appendChild(app.view);
-```
-
-
-### Browser
-
-```html
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.1.3/pixi.min.js"></script>
-<script src="https://cdn.rawgit.com/sbfkcel/pixi-apngAndGif/master/dist/PixiApngAndGif.js"></script>
-```
-
-### Application code
-
-```javascript
-const app = new PIXI.Application();
-const loader = PIXI.Loader.shared,
+const loader = Loader.shared,
+    title = document.title,
     loadOption = {
-        loadType: PIXI.LoaderResource.LOAD_TYPE.XHR,
-        xhrType: PIXI.LoaderResource.XHR_RESPONSE_TYPE.BUFFER,
-        crossOrigin:''
+        loadType: LoaderResource.LOAD_TYPE.XHR,
+        xhrType: LoaderResource.XHR_RESPONSE_TYPE.BUFFER,
+        crossOrigin: ''
     },
     imgs = {
-        gif:'https://isparta.github.io/compare/image/dongtai/gif/1.gif',
-        apng:'https://isparta.github.io/compare/image/dongtai/apng/1.png'
+        gif: 'http://isparta.github.io/compare/image/dongtai/gif/1.gif',
+        apng: 'http://isparta.github.io/compare/image/dongtai/apng/1.png'
+        // gif:'./1.gif',
+        // apng:'./1.png'
     };
 
-loader.add(imgs.gif,loadOption);
-loader.add(imgs.apng,loadOption);
-loader.load((progress,resources)=>{
-    window.gif = new PixiApngAndGif(imgs.gif,resources);
-    window.apng = new PixiApngAndGif(imgs.apng,resources);
 
-    let gifSprite = window.gif.sprite,
-        apngSprite = window.apng.sprite;
+loader.add(imgs.gif, loadOption);
+loader.add(imgs.apng, loadOption);
+
+loader.load((progress, resources) => {
+    document.title = title;
+
+    window['gif'] = new Image(imgs.gif, resources);
+    window['apng'] = new Image(imgs.apng, resources);
+
+    let gifSprite = window['gif'].sprite,
+        apngSprite = window['apng'].sprite;
 
     gifSprite.x = 100;
     apngSprite.x = 450;
@@ -96,6 +76,11 @@ loader.load((progress,resources)=>{
 
     app.stage.addChild(gifSprite);
     app.stage.addChild(apngSprite);
+
+});
+
+loader.onProgress.add(() => {
+    document.title = Math.round(loader.progress).toString();
 });
 
 document.body.appendChild(app.view);
