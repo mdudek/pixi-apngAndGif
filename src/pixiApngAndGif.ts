@@ -340,10 +340,9 @@ class Image {
             spriteSheet = Texture.from(canvas);
             obj.textures.push(new Texture(spriteSheet, new Rectangle(0, 0, gifWidth, gifHeight)));
         }
-        ;
         // document.body.appendChild(canvas);
         return obj;
     }
 }
 
-export default Image;
+export { Image };

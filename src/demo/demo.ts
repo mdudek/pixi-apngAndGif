@@ -1,4 +1,4 @@
-import $apngAndGif from '../pixiApngAndGif'
+import { Image } from '../pixiApngAndGif'
 import {Application} from '@pixi/app';
 import { Loader, LoaderResource } from '@pixi/loaders';
 import { Renderer, BatchRenderer } from '@pixi/core';
@@ -36,8 +36,8 @@ loader.add(imgs.apng,loadOption);
 loader.load((progress,resources)=>{
     document.title = title;
 
-    window['gif'] = new $apngAndGif(imgs.gif,resources);
-    window['apng'] = new $apngAndGif(imgs.apng,resources);
+    window['gif'] = new Image(imgs.gif,resources);
+    window['apng'] = new Image(imgs.apng,resources);
 
     let gifSprite = window['gif'].sprite,
         apngSprite = window['apng'].sprite;

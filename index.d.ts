@@ -1,4 +1,4 @@
-declare module 'pixi-apngandgif/pixiApngAndGif' {
+declare module 'pixi-apngandgif' {
   import { Sprite } from '@pixi/sprite';
   class Image {
       private eSource;
@@ -47,6 +47,6 @@ declare module 'pixi-apngandgif/pixiApngAndGif' {
           textures: any[];
       };
   }
-  export default Image;
+  export { Image };
 
 }
