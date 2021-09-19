@@ -6,17 +6,13 @@
     "removeComments": false,
     "sourceMap": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "target": "ESNext",
-    "module": "ESNext",
-    "outDir": "./dist",
+    "target": "es5",
+    "module": "commonjs",
     "moduleResolution": "node",
     "lib": [
       "es2015",
       "dom",
       "es5"
     ]
-  },
-  "include": ["src/demo.ts", "src/PixiApngAndGif.ts"],
-  "exclude": ["node_modules", "dist"]
+  }
 }

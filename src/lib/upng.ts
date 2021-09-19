@@ -297,7 +297,7 @@ export function decodeBuffer(buff) {
                 cmeth = data[off + 1];
             off += 2;
             nz = bin.nextZero(data, off);
-            var ltag = bin.readASCII(data, off, nz - off);
+            let ltag = bin.readASCII(data, off, nz - off);
             off = nz + 1;
             nz = bin.nextZero(data, off);
             let tkeyw = bin.readUTF8(data, off, nz - off);

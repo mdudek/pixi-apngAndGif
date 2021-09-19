@@ -1,8 +1,19 @@
-import $apngAndGif from './PixiApngAndGif'
+import $apngAndGif from '../pixiApngAndGif'
 import {Application} from '@pixi/app';
 import { Loader, LoaderResource } from '@pixi/loaders';
+import { Renderer, BatchRenderer } from '@pixi/core';
+import {TickerPlugin} from '@pixi/ticker';
 
-const app = new Application();
+Application.registerPlugin(TickerPlugin);
+Renderer.registerPlugin('batch', BatchRenderer);
+const app = new Application({
+    width: 800,
+    height: 600,
+    backgroundAlpha: 0,
+    backgroundColor: 0x000000,
+    preserveDrawingBuffer: false,
+    antialias: false,
+});
 
 const loader = Loader.shared,
     title = document.title,
@@ -39,6 +50,7 @@ loader.load((progress,resources)=>{
 
     app.stage.addChild(gifSprite);
     app.stage.addChild(apngSprite);
+
 });
 
 loader.onProgress.add(() => {
