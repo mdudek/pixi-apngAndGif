@@ -22,7 +22,7 @@ module.exports = (env, options) => {
             clean: isLibrary,
             ...(isLibrary ? {library: {
                 name: 'pixiApngAndGif',
-                type: 'commonjs2',
+                type: 'umd',
             }} : {}),
         },
         optimization: {
@@ -85,9 +85,7 @@ module.exports = (env, options) => {
         },
         plugins: [
             ...(generateDTS ? [
-                new NpmDtsPlugin({
-                    entry: 'src/pixiApngAndGif.ts'
-                })
+                new NpmDtsPlugin()
             ] : []),
             ...(isLibrary ? [] : [new HtmlWebpackPlugin({
                 template: 'src/demo/index.html',
